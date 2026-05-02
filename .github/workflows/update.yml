@@ -9,6 +9,9 @@ jobs:
   build:
     runs-on: windows-latest
 
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
       - uses: actions/checkout@v4
 
@@ -17,11 +20,16 @@ jobs:
         run: |
           ./generate_ips.ps1
 
-      - name: Commit result
+      - name: Commit & Push if changed
         shell: bash
         run: |
           git config user.name "bot"
           git config user.email "bot@example.com"
-          git add instagram_ips.txt
-          git commit -m "update ips" || exit 0
-          git push
+
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git add instagram_ips.txt
+            git commit -m "update ips"
+            git push
+          else
+            echo "No changes"
+          fi
