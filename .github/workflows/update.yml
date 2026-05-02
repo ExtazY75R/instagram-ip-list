@@ -1,0 +1,26 @@
+name: Update Instagram IPs
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run script
+        shell: powershell
+        run: |
+          ./generate_ips.ps1
+
+      - name: Commit result
+        run: |
+          git config user.name "bot"
+          git config user.email "bot@example.com"
+          git add instagram_ips.txt
+          git commit -m "update ips" || exit 0
+          git push
